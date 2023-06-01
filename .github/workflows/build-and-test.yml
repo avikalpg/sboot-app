@@ -52,18 +52,18 @@ jobs: # each job will run in its own VM
 
     runs-on: ubuntu-22.04
 
+    timeout-minutes: 5
+
     needs: [build, gen-matrix]
 
-    timeout-minutes: 10
-
     env:
-      NAME: Earth # you can use different environment variables for each job
+      NAME: Planet
 
     steps:
 
       - name: Demo of how to access current matrix context
         run: |
-          echo "Browser:" ${{ matrix.browser }}
+          echo "Browser: " ${{ matrix.browser }}
           echo "Device: ${{ matrix.device }}"
 
       - name: Step inside test job
@@ -80,5 +80,18 @@ jobs: # each job will run in its own VM
         if: ${{ github.ref == 'refs/heads/main' }} # condition for only running this if HEAD is on main
         run: echo "Execute this step conditionally, only on main branch"
 
+      - name: Send some output to logfile
+        run: |
+          echo "Hello ${{ matrix.browser }} ${{ matrix.device }}" > app_${{matrix.browser}}_${{matrix.device}}.log
+          echo "This is another line" >> app_${{matrix.browser}}_${{matrix.device}}.log
+          echo "Some error occurred!" > err_${{matrix.browser}}_${{matrix.device}}.log
+
+      - name: Export results
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: |
+            app_${{matrix.browser}}_${{matrix.device}}.log
+            err_${{matrix.browser}}_${{matrix.device}}.log
 
 
