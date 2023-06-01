@@ -25,8 +25,8 @@ jobs: # each job will run in its own VM
 
   test: # this job will run in parallel with the "build" job
 
-    strategy: # this runs 4 VMs in parallel now -> chrome-desktop, chrome-mobile, firefox-desktop, firefox-mobile
-      max-parallel: 2
+    strategy: # this runs 8 VMs, but only 2 in parallel at a time
+      max-parallel: 2 # controls the max number of VMs running in parallel. Otherwise it will run all possible combinations in parallel
       matrix:
         os: [ubuntu-20.04, ubuntu-22.04]
         browser: [chrome, firefox]
