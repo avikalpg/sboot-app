@@ -3,6 +3,8 @@ name: Build & Test
 on:
   push:
     branches: [ "main", "rel-*" ]
+  schedule:
+    - cron: '45 11 * * *' # 11:45 AM GMT (5:15 PM IST) daily
 
 env:
   NAME: Avikalp Gupta
@@ -47,8 +49,7 @@ jobs: # each job will run in its own VM
 
   test: # this job will run in parallel with the "build" job
 
-    # fromJSON is a in-built function provided by Github Actions
-    strategy: ${{ fromJSON(needs.gen-matrix.outputs.matrix) }}
+    strategy: ${{ fromJSON(needs.gen-matrix.outputs.matrix) }} # fromJSON is a in-built function provided by Github Actions
 
     runs-on: ubuntu-22.04
 
