@@ -23,14 +23,14 @@ jobs: # each job will run in its own VM
       - name: Another step
         run: echo "This is another step in the same job"
 
-  test:
+  test: # this job will run in parallel with the "build" job
 
     runs-on: ubuntu-22.04
 
     timeout-minutes: 10
 
     env:
-      NAME: Planet
+      NAME: Planet # you can use different environment variables for each job
 
     steps:
 
