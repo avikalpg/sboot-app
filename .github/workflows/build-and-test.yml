@@ -23,26 +23,37 @@ jobs: # each job will run in its own VM
       - name: Another step
         run: echo "This is another step in the same job"
 
+  gen-matrix:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.execute.outputs.matrix }}
+    steps:
+      - name: Get test combinations
+        id: execute
+        run: | # github.event.head_commit.message lets you control the strategy from commit message; Here: @@mobile
+          echo Commit message: ${{ github.event.head_commit.message }}
+          combs='{"browser": ["chrome", "firefox"], "device": ["desktop", "mobile"]}'
+          if [[ "${{ github.event.head_commit.message }}" == *@@mobile* ]]; then
+            # If commit message has @@mobile, ignore desktop and execute only for mobile
+            matrix=$(echo $combs | sed -e 's/"desktop", //')
+          else
+            matrix=$combs
+          fi
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+        # $GITHUB_OUTPUT lets the next steps to access the value computed
+
+      - name: Access output of prev step
+        run: echo ${{ steps.execute.outputs.matrix }}
+
+
+
   test: # this job will run in parallel with the "build" job
 
-    strategy: # this runs 8 VMs, but only 2 in parallel at a time
-      max-parallel: 2 # controls the max number of VMs running in parallel. Otherwise it will run all possible combinations in parallel
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-        browser: [chrome, firefox]
-        device: [desktop, mobile]
-        include:
-          - os: windows-latest
-            browser: edge
-            device: desktop
-        exclude:
-          - os: ubuntu-20.04
-            browser: chrome
-            device: mobile
+    strategy: ${{ fromJSON(needs.gen-matrix.outputs.matrix) }}
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
 
-    needs: build
+    needs: [build, gen-matrix]
 
     timeout-minutes: 10
 
@@ -61,6 +72,14 @@ jobs: # each job will run in its own VM
 
       - name: Another step
         run: echo "This is another step in the same job"
+
+      - name: Disabled step
+        if: false
+        run: echo "This step may be enabled when debugging"
+
+      - name: Conditional step
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "Execute this step conditionally, only on main branch"
 
 
 
