@@ -15,8 +15,6 @@ jobs: # each job will run in its own VM
 
     timeout-minutes: 5
 
-    needs: test
-
     steps:
 
       - name: Greet user
@@ -27,7 +25,14 @@ jobs: # each job will run in its own VM
 
   test: # this job will run in parallel with the "build" job
 
+    strategy: # this runs 4 VMs in parallel now -> chrome-desktop, chrome-mobile, firefox-desktop, firefox-mobile
+      matrix:
+        browser: [chrome, firefox]
+        device: [desktop, mobile]
+
     runs-on: ubuntu-22.04
+
+    needs: test
 
     timeout-minutes: 10
 
@@ -35,6 +40,11 @@ jobs: # each job will run in its own VM
       NAME: Planet # you can use different environment variables for each job
 
     steps:
+
+      - name: Demo of how to access current matrix context
+        run: |
+          echo "Browser:" ${{ matrix.browser }}
+          echo "Device: ${{ matrix.device }}"
 
       - name: Step inside test job
         run: echo "Hello $NAME"
