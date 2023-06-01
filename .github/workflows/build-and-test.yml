@@ -29,8 +29,6 @@ jobs: # each job will run in its own VM
 
     runs-on: ubuntu-22.04
 
-    needs: build
-
     timeout-minutes: 10
 
     env:
