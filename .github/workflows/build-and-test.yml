@@ -49,7 +49,8 @@ jobs: # each job will run in its own VM
 
   test: # this job will run in parallel with the "build" job
 
-    strategy: ${{ fromJSON(needs.gen-matrix.outputs.matrix) }} # fromJSON is a in-built function provided by Github Actions
+    strategy:
+      matrix: ${{ fromJSON(needs.gen-matrix.outputs.matrix) }} # fromJSON is a in-built function provided by Github Actions
 
     runs-on: ubuntu-22.04
 
